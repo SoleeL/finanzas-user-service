@@ -1,0 +1,36 @@
+﻿services:
+  finanzas-user-database:
+    container_name: finanzas-user-database
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: finanzas-user-database
+      POSTGRES_USER: finanzas-user-database
+      POSTGRES_PASSWORD: finanzas-user-database
+    volumes:
+      - finanzas-user-database:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - kong-network
+  
+  finanzas-user-service:
+    image: finanzas-user-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - finanzas-user-database
+    environment:
+      USER_ROLE_PG_HOST: finanzas-user-database
+      USER_ROLE_PG_DATABASE: finanzas-user-database
+      USER_ROLE_PG_USER: finanzas-user-database
+      USER_ROLE_PG_PASSWORD: finanzas-user-database
+    networks:
+      - kong-network
+
+volumes:
+  finanzas-user-database:
+
+networks:
+  kong-network:
+    external: true
