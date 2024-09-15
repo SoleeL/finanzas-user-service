@@ -116,14 +116,19 @@ public static class UserEndpoints
         [FromQuery] string? email = null,
         [FromQuery] string? nickname = null,
         [FromQuery] string? fullname = null,
-        [FromQuery] string? role = null
+        [FromQuery] string? role = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 10
     )
     {
         // TODO: Es necesario validar parameros FromUri
         // TODO: Es necesario validar parameros FromQuery
+        var paginationDto = new PaginationDto() { Page = page, Size = size };
+        
         // TODO: Es necesario validar parameros FromBody
         
         var users = await userRepository.GetAllUsersAsync(
+            paginationDto,
             email,
             nickname,
             fullname,

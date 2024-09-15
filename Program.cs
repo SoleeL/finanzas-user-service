@@ -26,6 +26,9 @@ builder.Services.AddOutputCache();
 // Agregar servicios
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+// Agregar el Http context
+builder.Services.AddHttpContextAccessor();
+
 // Agregar automaper y su configuracion
 builder.Services.AddAutoMapper(typeof(Program));
 
