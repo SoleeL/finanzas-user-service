@@ -9,18 +9,18 @@ public class AutoMapperProfiles : Profile
 {
     public AutoMapperProfiles()
     {
-        CreateMap<RegisterUserDTO, User>()
+        CreateMap<RegisterUserDto, User>()
             .ForMember(dest => dest.RoleId, 
                 opt => opt.MapFrom(src => RolesExtensions.GetNumeralRoleByEmail(src.Email)));
 
-        CreateMap<User, GetUserDTO>()
+        CreateMap<User, GetUserDto>()
             .ForMember(dest => dest.Id, 
                 opt => opt.MapFrom(src => src.Id.ToString()))
             .ForMember(dest => dest.Role, 
                 opt => opt.MapFrom(src => Enum.GetName(typeof(Roles), src.RoleId)))
             .ForMember(dest => dest.CreatedAt, 
-                opt => opt.MapFrom(src => DateConvertionUtility.GetUnixTimestampMilliseconds(src.CreatedAt)))
+                opt => opt.MapFrom(src => src.CreatedAt.ToUnixTimeMilliseconds()))
             .ForMember(dest => dest.UpdatedAt, 
-                opt => opt.MapFrom(src => DateConvertionUtility.GetUnixTimestampMilliseconds(src.UpdatedAt)));
+                opt => opt.MapFrom(src => src.UpdatedAt.ToUnixTimeMilliseconds()));
     }
 }

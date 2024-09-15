@@ -12,7 +12,7 @@ using finanzas_user_service.Data;
 namespace finanzas_user_service.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240915002806_Initial")]
+    [Migration("20240915205341_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace finanzas_user_service.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("finanzas_user_service.Data.Entity.Role", b =>
+            modelBuilder.Entity("finanzas_user_service.Data.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,18 +33,18 @@ namespace finanzas_user_service.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
@@ -52,16 +52,16 @@ namespace finanzas_user_service.Migrations
                     b.ToTable("Role");
                 });
 
-            modelBuilder.Entity("finanzas_user_service.Data.Entity.User", b =>
+            modelBuilder.Entity("finanzas_user_service.Data.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Email")
@@ -83,9 +83,9 @@ namespace finanzas_user_service.Migrations
                     b.Property<int>("RoleId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
@@ -95,9 +95,9 @@ namespace finanzas_user_service.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("finanzas_user_service.Data.Entity.User", b =>
+            modelBuilder.Entity("finanzas_user_service.Data.Entities.User", b =>
                 {
-                    b.HasOne("finanzas_user_service.Data.Entity.Role", "Role")
+                    b.HasOne("finanzas_user_service.Data.Entities.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -106,7 +106,7 @@ namespace finanzas_user_service.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("finanzas_user_service.Data.Entity.Role", b =>
+            modelBuilder.Entity("finanzas_user_service.Data.Entities.Role", b =>
                 {
                     b.Navigation("Users");
                 });

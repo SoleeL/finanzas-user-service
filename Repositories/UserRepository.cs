@@ -1,10 +1,11 @@
 using finanzas_user_service.Data;
 using finanzas_user_service.Data.Entities;
+using finanzas_user_service.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace finanzas_user_service.Repositories;
 
-public class UserRepository: IUserRepository
+public class UserRepository : IUserRepository
 {
     private readonly ApplicationDbContext _context;
 
@@ -25,19 +26,35 @@ public class UserRepository: IUserRepository
         return user.Id.ToString();
     }
 
-    public Task<User> GetAuthenticatedUserByTokenAsync(string token)
+    public Task<User> GetUserByAuthenticatedTokenAsync(string token)
     {
+        // README: usar .AsNoTracking()
         throw new NotImplementedException();
     }
 
     public async Task<User?> GetUserByIdAsync(Guid guid)
     {
-        return await this._context.User.FirstOrDefaultAsync(u => u.Id == guid);
+        return await this._context.User.AsNoTracking().FirstOrDefaultAsync(u => u.Id == guid);
     }
 
-    public async Task<List<User>> GetAllUsersAsync()
+    public async Task<List<User>> GetAllUsersAsync(
+        string? email = null, 
+        string? nickname = null, 
+        string? fullname = null, 
+        string? role = null
+    )
     {
-        return await this._context.User.ToListAsync();
+        var query = _context.User.AsNoTracking().AsQueryable();
+
+        if (!string.IsNullOrEmpty(email)) query = query.Where(u => u.Email.Contains(email));
+        
+        if (!string.IsNullOrEmpty(nickname)) query = query.Where(u => u.NickName.Contains(nickname));
+        
+        if (!string.IsNullOrEmpty(fullname)) query = query.Where(u => u.FullName.Contains(fullname));
+        
+        if (!string.IsNullOrEmpty(role) && Enum.TryParse<Roles>(role, out Roles roleEnum)) query = query.Where(u => u.RoleId == (int) roleEnum);
+        
+        return await query.ToListAsync();
     }
 
     public Task<User> UpdateUserByIdAsync(string id, User user)

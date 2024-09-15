@@ -10,10 +10,8 @@ public class User
     public string FullName { get; set; }
     public string HashedPassword { get; set; }
     public int RoleId { get; set; }
-    [Column(TypeName = "timestamp without time zone")]
-    public DateTime CreatedAt { get; set; }
-    [Column(TypeName = "timestamp without time zone")]
-    public DateTime UpdatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
     
     public Role Role { get; set; }
 }
