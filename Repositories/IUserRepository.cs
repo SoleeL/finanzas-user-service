@@ -1,9 +1,11 @@
-using finanzas_user_service.Data.Entity;
+using finanzas_user_service.Data.Entities;
 
-namespace finanzas_user_service.Repository;
+namespace finanzas_user_service.Repositories;
 
 public interface IUserRepository
 {
+    Task<bool> UserExist(string email);
+    
     Task<string> RegisterUserAsync(User user);
     
     //     - GET /api/user/me

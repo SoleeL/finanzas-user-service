@@ -1,8 +1,8 @@
 using finanzas_user_service.Data;
-using finanzas_user_service.Data.Entity;
+using finanzas_user_service.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace finanzas_user_service.Repository;
+namespace finanzas_user_service.Repositories;
 
 public class UserRepository: IUserRepository
 {
@@ -13,12 +13,15 @@ public class UserRepository: IUserRepository
         this._context = context;
     }
 
+    public async Task<bool> UserExist(string email)
+    {
+        return await this._context.User.AnyAsync(u => u.Email == email);
+    }
+
     public async Task<string> RegisterUserAsync(User user)
     {
         this._context.User.Add(user);
-        
         await this._context.SaveChangesAsync();
-
         return user.Id.ToString();
     }
 

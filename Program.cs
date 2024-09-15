@@ -1,8 +1,6 @@
 using finanzas_user_service.Data;
-using finanzas_user_service.Data.Entity;
 using finanzas_user_service.Endpoints;
-using finanzas_user_service.Repository;
-using Microsoft.AspNetCore.Mvc;
+using finanzas_user_service.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,8 +23,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(optionsBuilder => optionsBui
 // Usar cache
 builder.Services.AddOutputCache();
 
-
+// Agregar servicios
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+// Agregar automaper y su configuracion
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 

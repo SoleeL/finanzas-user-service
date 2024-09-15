@@ -16,7 +16,11 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5236",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "USER_PG_HOST": "localhost:5433",
+        "USER_PG_DATABASE": "finanzas-user-database",
+        "USER_PG_USER": "finanzas-user-database",
+        "USER_PG_PASSWORD": "finanzas-user-database"
       }
     },
     "https": {

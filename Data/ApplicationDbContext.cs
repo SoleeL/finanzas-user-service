@@ -1,4 +1,4 @@
-using finanzas_user_service.Data.Entity;
+using finanzas_user_service.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace finanzas_user_service.Data;
