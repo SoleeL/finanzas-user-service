@@ -21,10 +21,10 @@
     depends_on:
       - finanzas-user-database
     environment:
-      USER_ROLE_PG_HOST: finanzas-user-database
-      USER_ROLE_PG_DATABASE: finanzas-user-database
-      USER_ROLE_PG_USER: finanzas-user-database
-      USER_ROLE_PG_PASSWORD: finanzas-user-database
+      USER_PG_HOST: finanzas-user-database
+      USER_PG_DATABASE: finanzas-user-database
+      USER_PG_USER: finanzas-user-database
+      USER_PG_PASSWORD: finanzas-user-database
     networks:
       - kong-network
 
