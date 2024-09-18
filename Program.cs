@@ -1,6 +1,7 @@
 using finanzas_user_service.Data;
 using finanzas_user_service.Endpoints;
 using finanzas_user_service.Repositories;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +32,9 @@ builder.Services.AddHttpContextAccessor();
 
 // Agregar automaper y su configuracion
 builder.Services.AddAutoMapper(typeof(Program));
+
+// Agregar servicio de validacion
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 var app = builder.Build();
 

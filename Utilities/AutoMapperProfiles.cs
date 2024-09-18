@@ -9,7 +9,7 @@ public class AutoMapperProfiles : Profile
 {
     public AutoMapperProfiles()
     {
-        CreateMap<RegisterUserDto, User>()
+        CreateMap<CreateUserDto, User>()
             .ForMember(dest => dest.RoleId, 
                 opt => opt.MapFrom(src => RolesExtensions.GetNumeralRoleByEmail(src.Email)));
 

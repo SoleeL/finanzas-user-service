@@ -48,7 +48,7 @@ public class MailRegexUtility
             return false;
         }
     }
-    
+
     public static string GetDomain(string email)
     {
         if (IsValidEmail(email))

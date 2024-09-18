@@ -3,6 +3,8 @@ using finanzas_user_service.Data.Entities;
 using finanzas_user_service.DTOs;
 using finanzas_user_service.Repositories;
 using finanzas_user_service.Utilities;
+using finanzas_user_service.Validators;
+using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,9 +14,9 @@ public static class UserEndpoints
 {
     public static RouteGroupBuilder MapUser(this RouteGroupBuilder group)
     {
-        group.MapPost("/register", RegisterUser)
+        group.MapPost("/create", CreateUser)
             .CacheOutput(policyBuilder => policyBuilder.Expire(TimeSpan.FromSeconds(15))) // Implementar cache
-            .WithName("RegisterUser");
+            .WithName("CreateUser");
 
         // - GET /api/user/me
         // - Descripción: Obtiene la información del perfil del usuario autenticado. Utilizado para obtener información del perfil del usuario actual sin necesidad de especificar el userId.
@@ -64,40 +66,37 @@ public static class UserEndpoints
         return group;
     }
 
-    static async Task<Results<BadRequest<string>, Created<GetUserDto>>> RegisterUser(
-        [FromBody] RegisterUserDto registerUserDto,
+    static async Task<Results<ValidationProblem, Created<GetUserDto>>> CreateUser(
+        [FromBody] CreateUserDto createUserDto,
         IUserRepository userRepository,
-        IMapper mapper
+        IMapper mapper,
+        IValidator<CreateUserDto> createUserDtoValidator
     )
     {
-        if (!MailRegexUtility.IsValidEmail(registerUserDto.Email))
+        var validationResult = await createUserDtoValidator.ValidateAsync(createUserDto);
+        if (!validationResult.IsValid)
         {
-            return
-                TypedResults.BadRequest("Invalid email"); // TODO: CAmbiar por el envio de un modelo con lo que esta mal
+            return TypedResults.ValidationProblem(validationResult.ToDictionary());
         }
-
-        var userExist = await userRepository.UserExist(registerUserDto.Email);
-
-        if (userExist)
-        {
-            return TypedResults.BadRequest("Email already used");
-        }
-
-        var user = mapper.Map<User>(registerUserDto);
+        
+        var user = mapper.Map<User>(createUserDto);
 
         await userRepository.RegisterUserAsync(user);
 
-        var getUser = mapper.Map<GetUserDto>(user);
+        var getUserDto = mapper.Map<GetUserDto>(user);
 
-        return TypedResults.Created($"/user/{user.Id}", getUser);
+        return TypedResults.Created($"/user/{user.Id}", getUserDto);
     }
 
     static async Task<Results<BadRequest<string>, NotFound, Ok<GetUserDto>>> GetUserById(
-        Guid guid,
+        [FromRoute] Guid guid,
         IUserRepository userRepository,
         IMapper mapper
     )
     {
+        // README: No es necesario implementar una validacion del guid, ya que ante uno no valido, el servicio
+        // respondera automaticamente con 404
+        
         var user = await userRepository.GetUserByIdAsync(guid);
 
         if (user is null)

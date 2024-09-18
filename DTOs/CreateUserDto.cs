@@ -1,6 +1,6 @@
 namespace finanzas_user_service.DTOs;
 
-public class RegisterUserDto
+public class CreateUserDto
 {
     public string Email { get; set; }
     public string Nickname { get; set; }
