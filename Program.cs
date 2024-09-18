@@ -36,6 +36,9 @@ builder.Services.AddAutoMapper(typeof(Program));
 // Agregar servicio de validacion
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
+// Agregar servicio de mensajes de error para el usuario
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -44,6 +47,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// app.UseExceptionHandler();
+app.UseStatusCodePages();
 
 app.UseHttpsRedirection();
 app.UseOutputCache();
