@@ -1,10 +1,9 @@
 using AutoMapper;
 using finanzas_user_service.Data.Entities;
 using finanzas_user_service.DTOs;
+using finanzas_user_service.Filters;
 using finanzas_user_service.Repositories;
 using finanzas_user_service.Utilities;
-using finanzas_user_service.Validators;
-using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +14,7 @@ public static class UserEndpoints
     public static RouteGroupBuilder MapUser(this RouteGroupBuilder group)
     {
         group.MapPost("/create", CreateUser)
+            .AddEndpointFilter<ValidatorFilter<CreateUserDto>>()
             .CacheOutput(policyBuilder => policyBuilder.Expire(TimeSpan.FromSeconds(15))) // Implementar cache
             .WithName("CreateUser");
 
@@ -25,6 +25,10 @@ public static class UserEndpoints
         // - GET /api/user/{userId}
         // - Descripción: Obtiene la información del usuario especificado.
         // - Parámetros: userId (ID del usuario)
+
+        // README: No es necesario implementar una validacion del guid, ya que ante uno no valido, el servicio
+        // respondera automaticamente con 404
+
         group.MapGet("/{guid:guid}", GetUserById)
             .CacheOutput(policyBuilder => policyBuilder.Expire(TimeSpan.FromSeconds(15)))
             .WithName("GetUser");
@@ -36,7 +40,7 @@ public static class UserEndpoints
             .CacheOutput(policyBuilder => policyBuilder.Expire(TimeSpan.FromSeconds(15))) // Implementar cache
             .WithName("GetAllUsers")
             .WithOpenApi();
-        
+
         // - PUT /api/user/{userId}
         // - Descripción: Actualiza la información del perfil del usuario.
         // - Cuerpo de Solicitud: Datos actualizados del usuario.
@@ -66,50 +70,50 @@ public static class UserEndpoints
         return group;
     }
 
-    static async Task<Results<ValidationProblem, Created<GetUserDto>>> CreateUser(
+    private static async Task<Created<ApiResponseDto<GetUserDto>>> CreateUser(
         [FromBody] CreateUserDto createUserDto,
-        IUserRepository userRepository,
         IMapper mapper,
-        IValidator<CreateUserDto> createUserDtoValidator
+        IUserRepository userRepository
     )
     {
-        var validationResult = await createUserDtoValidator.ValidateAsync(createUserDto);
-        if (!validationResult.IsValid)
-        {
-            return TypedResults.ValidationProblem(validationResult.ToDictionary());
-        }
-        
+        var apiResponse = new ApiResponseDto<GetUserDto>();
+
         var user = mapper.Map<User>(createUserDto);
 
         await userRepository.RegisterUserAsync(user);
 
         var getUserDto = mapper.Map<GetUserDto>(user);
 
-        return TypedResults.Created($"/user/{user.Id}", getUserDto);
+        apiResponse.Data = getUserDto;
+
+        return TypedResults.Created($"/user/{apiResponse.Data.Id}", apiResponse);
     }
 
-    static async Task<Results<BadRequest<string>, NotFound, Ok<GetUserDto>>> GetUserById(
-        [FromRoute] Guid guid,
-        IUserRepository userRepository,
-        IMapper mapper
-    )
+    private static async Task<Results<NotFound<ApiResponseDto<GetUserDto>>, Ok<ApiResponseDto<GetUserDto>>>>
+        GetUserById(
+            [FromRoute] Guid guid,
+            IUserRepository userRepository,
+            IMapper mapper
+        )
     {
-        // README: No es necesario implementar una validacion del guid, ya que ante uno no valido, el servicio
-        // respondera automaticamente con 404
-        
+        var apiResponse = new ApiResponseDto<GetUserDto>();
+
         var user = await userRepository.GetUserByIdAsync(guid);
 
         if (user is null)
         {
-            return TypedResults.NotFound();
+            apiResponse.Success = false;
+            apiResponse.ErrorMessage = "User not found";
+            return TypedResults.NotFound(apiResponse);
         }
 
         var getUser = mapper.Map<GetUserDto>(user);
+        apiResponse.Data = getUser;
 
-        return TypedResults.Ok<GetUserDto>(getUser);
+        return TypedResults.Ok<ApiResponseDto<GetUserDto>>(apiResponse);
     }
 
-    static async Task<Ok<List<GetUserDto>>> GetAllUsers(
+    private static async Task<Ok<ApiResponseDto<List<GetUserDto>>>> GetAllUsers(
         IUserRepository userRepository,
         IMapper mapper,
         [FromQuery] string? email = null,
@@ -120,19 +124,24 @@ public static class UserEndpoints
         [FromQuery] int size = 10
     )
     {
+        var apiResponse = new ApiResponseDto<List<GetUserDto>>();
+
         // TODO: Es necesario validar parameros FromUri
         // TODO: Es necesario validar parameros FromQuery
         var paginationDto = new PaginationDto() { Page = page, Size = size };
-        
+
         // TODO: Es necesario validar parameros FromBody
-        
+
         var users = await userRepository.GetAllUsersAsync(
             paginationDto,
             email,
             nickname,
             fullname,
             role);
+
         var getUsers = mapper.Map<List<GetUserDto>>(users);
-        return TypedResults.Ok<List<GetUserDto>>(getUsers);
+        apiResponse.Data = getUsers;
+
+        return TypedResults.Ok<ApiResponseDto<List<GetUserDto>>>(apiResponse);
     }
 }

@@ -1,4 +1,6 @@
+using finanzas_user_service.Utilities;
 using FluentValidation;
+using FluentValidation.Results;
 
 namespace finanzas_user_service.Filters;
 
@@ -18,7 +20,7 @@ public class ValidatorFilter<T> : IEndpointFilter
         var dtoToBeValidated = context.Arguments.OfType<T>().FirstOrDefault();
         if (dtoToBeValidated is null)
         {
-            return TypedResults.Problem();
+            return TypedResults.BadRequest("The body is empty");
         }
         
         var validationResult = await validator.ValidateAsync(dtoToBeValidated);
