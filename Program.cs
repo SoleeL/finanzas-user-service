@@ -1,5 +1,6 @@
 using finanzas_user_service.Data;
 using finanzas_user_service.Endpoints;
+using finanzas_user_service.Handlers;
 using finanzas_user_service.Repositories;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +38,7 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 // Agregar servicio de mensajes de error para el usuario
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
@@ -48,7 +50,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// app.UseExceptionHandler();
+app.UseExceptionHandler();
 app.UseStatusCodePages();
 
 app.UseHttpsRedirection();
@@ -71,6 +73,11 @@ await DatabaseInitializer.SeedAsync(dbContext);
 
 // Migracion automatica:
 // https://www.youtube.com/watch?v=o9eEEFGgSHw
+
+app.MapGet("/error", () =>
+{
+    throw new ApplicationException("An unhandled exception occurred.");
+});
 
 app.MapGroup("/").MapUser();
 

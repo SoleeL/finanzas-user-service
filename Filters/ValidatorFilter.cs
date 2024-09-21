@@ -20,13 +20,21 @@ public class ValidatorFilter<T> : IEndpointFilter
         var dtoToBeValidated = context.Arguments.OfType<T>().FirstOrDefault();
         if (dtoToBeValidated is null)
         {
-            return TypedResults.BadRequest("The body is empty");
+            var apiResponseDto = new ApiResponseDto<string>(); 
+            apiResponseDto.Success = false;
+            apiResponseDto.ErrorMessage = "The body is empty";
+            return TypedResults.BadRequest(apiResponseDto);
         }
         
         var validationResult = await validator.ValidateAsync(dtoToBeValidated);
         if (!validationResult.IsValid)
         {
-            return TypedResults.ValidationProblem(validationResult.ToDictionary());
+            var apiResponseDto = new ApiResponseDto<IDictionary<string,string[]>>(); 
+            apiResponseDto.Success = false;
+            apiResponseDto.Data = validationResult.ToDictionary();
+            apiResponseDto.ErrorMessage = "Validation error";
+            
+            return TypedResults.BadRequest(apiResponseDto);
         }
         
         var results = await next(context);
