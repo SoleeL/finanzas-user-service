@@ -3,9 +3,9 @@
     container_name: finanzas-user-database
     image: postgres:latest
     environment:
-      POSTGRES_DB: finanzas-user-database
-      POSTGRES_USER: finanzas-user-database
-      POSTGRES_PASSWORD: finanzas-user-database
+      POSTGRES_DB: ${USER_DB_NAME}
+      POSTGRES_USER: ${USER_DB_USER}
+      POSTGRES_PASSWORD: ${USER_DB_PASSWORD}
     volumes:
       - finanzas-user-database:/var/lib/postgresql/data
     ports:
@@ -22,10 +22,10 @@
     depends_on:
       - finanzas-user-database
     environment:
-      USER_PG_HOST: finanzas-user-database
-      USER_PG_DATABASE: finanzas-user-database
-      USER_PG_USER: finanzas-user-database
-      USER_PG_PASSWORD: finanzas-user-database
+      USER_PG_HOST: ${USER_DB_HOST}
+      USER_PG_DATABASE: ${USER_DB_NAME}
+      USER_PG_USER: ${USER_DB_USER}
+      USER_PG_PASSWORD: ${USER_DB_PASSWORD}
 #    ports:
 #      - "8081:8080"
     networks:
