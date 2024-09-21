@@ -11,7 +11,8 @@
     ports:
       - "5433:5432"
     networks:
-      - kong-network
+      - external-network
+      - internal-network
   
   finanzas-user-service:
     image: finanzas-user-service
@@ -25,12 +26,23 @@
       USER_PG_DATABASE: finanzas-user-database
       USER_PG_USER: finanzas-user-database
       USER_PG_PASSWORD: finanzas-user-database
+#    ports:
+#      - "8081:8080"
     networks:
-      - kong-network
+      - internal-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.finanzas-user-service.rule=Host(`api.localhost`) && PathPrefix(`/user`)"
+      - "traefik.http.services.finanzas-user-service.loadbalancer.server.port=8080"
+      - "traefik.http.routers.finanzas-user-service.middlewares=replace-microservice-path"
+      - "traefik.http.middlewares.replace-microservice-path.replacepathregex.regex=^/user/?(.*)" # Obtener sub-ruta sin /user
+      - "traefik.http.middlewares.replace-microservice-path.replacepathregex.replacement=/$$1" # Reemplazar la request interna con la sub-ruta
 
 volumes:
   finanzas-user-database:
 
 networks:
-  kong-network:
+  external-network:
+    external: true
+  internal-network:
     external: true
