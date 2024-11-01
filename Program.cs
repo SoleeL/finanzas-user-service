@@ -22,11 +22,11 @@ var password = Environment.GetEnvironmentVariable("USER_PG_PASSWORD");
 var connectionString = $"Host={host};Database={database};Username={user};Password={password}";
 builder.Services.AddDbContext<ApplicationDbContext>(optionsBuilder => optionsBuilder.UseNpgsql(connectionString));
 
-// Usar cache
-builder.Services.AddOutputCache();
-
 // Agregar servicios
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+// Usar cache
+builder.Services.AddOutputCache();
 
 // Agregar el Http context
 builder.Services.AddHttpContextAccessor();
@@ -50,10 +50,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Controlar excepciones
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
+// Redireccion de request http a https
 app.UseHttpsRedirection();
+
+// Usar cache
 app.UseOutputCache();
 
 using var scope = app.Services.CreateScope();

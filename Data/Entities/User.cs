@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace finanzas_user_service.Data.Entities;
 
 public class User

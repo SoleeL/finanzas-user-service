@@ -26,14 +26,14 @@
       USER_PG_DATABASE: ${USER_DB_NAME}
       USER_PG_USER: ${USER_DB_USER}
       USER_PG_PASSWORD: ${USER_DB_PASSWORD}
-#    ports:
-#      - "8081:8080"
+    #    ports:
+    #      - "8081:8080"
     networks:
       - internal-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.finanzas-user-service.rule=Host(`api.localhost`) && PathPrefix(`/user`)"
       - "traefik.http.services.finanzas-user-service.loadbalancer.server.port=8080"
+      - "traefik.http.routers.finanzas-user-service.rule=Host(`api.localhost`) && PathPrefix(`/user`)"
       - "traefik.http.routers.finanzas-user-service.middlewares=replace-microservice-path"
       - "traefik.http.middlewares.replace-microservice-path.replacepathregex.regex=^/user/?(.*)" # Obtener sub-ruta sin /user
       - "traefik.http.middlewares.replace-microservice-path.replacepathregex.replacement=/$$1" # Reemplazar la request interna con la sub-ruta
